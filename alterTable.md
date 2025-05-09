@@ -4,7 +4,7 @@ This SQL script updates and re-establishes **foreign key constraints** across se
 
 ---
 
-## 📄 Purpose
+## Purpose
 
 The goal of this script is to:
 - Drop existing foreign key constraints (if any).
@@ -13,7 +13,7 @@ The goal of this script is to:
 
 ---
 
-## 🔐 Importance of Adding Foreign Keys
+##  Importance of Adding Foreign Keys
 
 Foreign keys are essential in a relational database for the following reasons:
 
@@ -23,7 +23,7 @@ Foreign keys are essential in a relational database for the following reasons:
 2. **Data Consistency**  
    Prevents insertion of invalid data. You cannot add a row in a child table (e.g., `RESULTS`) that references a non-existent parent (e.g., `DRIVERS`).
 
-3. **Cascading Updates/Deletes (Optional)**  
+3. **Cascading Updates/Deletes**  
    When configured, changes or deletions in a parent table can automatically propagate to related records in child tables, simplifying data management.
 
 4. **Better Query Optimization**  
@@ -34,7 +34,7 @@ Foreign keys are essential in a relational database for the following reasons:
 
 Adding foreign keys is a best practice in any normalized database schema and forms the backbone of data accuracy and application reliability.
 
-## 🗃️ Affected Tables
+## Affected Tables
 
 The following tables are included in this script:
 
