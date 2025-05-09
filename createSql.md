@@ -1,6 +1,23 @@
+# Entity-Relationship Diagram (ERD)
+
+
 # Formula 1 PostgreSQL Database Schema
 
 This repository contains the SQL schema for a PostgreSQL database designed to store historical and current data about Formula 1 racing. It includes circuits, constructors, races, results, drivers, and more.
+
+# Database Design Considerations
+
+### Primary Keys
+
+A Primary Key is a column (or set of columns) that uniquely identifies each record in a table. In this schema, each table has a primary key to ensure that no two rows can have the same identifier.
+
+### Composite Keys
+A Composite Key uses two or more columns to uniquely identify a record. 
+
+### Unique Constraints on URL 
+To ensure there are no duplicate URLs in the table.
+
+
 
 ## Schema Overview
 
@@ -10,8 +27,7 @@ All tables are defined under the `formula1` schema and represent various aspects
 
 ### Tables
 
-#### `circuits`
-Stores information about race circuits.
+
 
 ```sql
 drop table if exists formula1.circuits;
