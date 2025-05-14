@@ -26,6 +26,10 @@ All tables are defined under the `formula1` schema and represent various aspects
 
 ---
 
+## Tools used 
+PostgreSQL  
+[dbdiagram.io](https://dbdiagram.io)
+
 ### Tables
 
 
