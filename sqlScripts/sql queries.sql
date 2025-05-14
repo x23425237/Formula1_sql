@@ -12,6 +12,7 @@ WHERE r.year = 2023
 ORDER BY r.round, rs.position;
 
 
+
 WITH race_results_cte AS (
   SELECT
     rs.resultId,
@@ -145,7 +146,7 @@ ORDER BY r.name, lap_rank;
 
 
 
--- list top 5 ranks in each race. 
+-- list top 5 fastest rounds in each race. 
 
 with table_cte as (
 SELECT
@@ -158,6 +159,7 @@ r.year,
 FROM formula1.lapTimes lt
 INNER JOIN formula1.drivers d ON lt.driverId = d.driverId
 INNER JOIN formula1.races r ON lt.raceId = r.raceId
+--inner join formula1.results rs on rs.raceId=r.raceId
 WHERE lt.milliseconds IS NOT NULL )
 select * from table_cte c
 where lap_rank between 1 and 5 
@@ -165,35 +167,72 @@ order by year desc, milliseconds asc
 
 
 
-ORDER BY name, lap_rank;
+-- 
+SELECT 
+    d.forename || ' ' || d.surname AS driver_name,
+    r.raceid,                   
+    d.driverId,            
+    d.forename,            
+    d.surname,            
+    d.number,
+	--r.fastestlapspeed,A
+    CAST(AVG(ROUND(r.fastestlapspeed::FLOAT)) AS INT) AS average_fastest_lap_speed
+FROM formula1.results r
+INNER JOIN formula1.drivers d ON r.driverId = d.driverId  
+LEFT JOIN formula1.lapTimes lt ON r.raceId = lt.raceId AND r.driverId = lt.driverId  -- Join lapTimes to calculate fastest lap
+GROUP BY r.raceId, d.driverId, d.forename, d.surname, d.number
+ORDER BY r.raceId, d.surname;
 
 
 
--- Race Times for Lewis Hamilton and George Russell in the 2024 F1 Season
+-- Lap-by-Lap Performance Data with Status for Driver(s) in the 2024 Season - Race "Australian Grand Prix"
 
 SELECT
-d.number as driver_number,
-l.position,
-l.time,
-l.milliseconds,
-l.lap,
+  d.number AS driver_number,
+  l.time,
+  l.milliseconds AS lap_time_ms,
+  l.raceId,
+  l.position,
+  l.lap AS lap_number,
   d.forename || ' ' || d.surname AS driver_name,
   r.name AS race_name,
   rs.milliseconds AS race_time_ms,
   (rs.milliseconds || ' milliseconds')::interval AS time_formatted,
-  r.year as year,
-  r.date as race_date
+  r.year AS year,
+  r.date AS race_date,
+  CASE 
+    WHEN s.status = 'Engine' THEN 'Engine Failure'
+    WHEN s.status = 'Brakes' THEN 'Brake Failure'
+    ELSE s.status 
+  END AS race_status
 FROM formula1.results rs
 INNER JOIN formula1.drivers d ON rs.driverId = d.driverId
 INNER JOIN formula1.races r ON rs.raceId = r.raceId
-inner join formula1.laptimes l on l.raceid=r.raceid
-WHERE r.year = 2024 AND rs.milliseconds IS NOT NULL
---and rs.milliseconds =0
-and d.number in (44)
-ORDER BY race_time_ms,r.date,driver_number,l.position,lap ;
+INNER JOIN formula1.laptimes l ON l.raceId = rs.raceId AND l.driverId = rs.driverId
+INNER JOIN formula1.status s ON rs.statusId = s.statusId
+WHERE r.year = 2024
+ -- AND d.number = 44
+  AND l.raceId = 1123
+ORDER BY l.lap, l.milliseconds;
 
 
+-- constructor standings 
 
-
+SELECT 
+    c.constructorId,
+    c.name AS constructor_name,
+    r.raceId,
+    r.name AS race_name,
+    r.date,
+    cs.points,
+    cs.position,
+    cs.wins
+FROM 
+    formula1.constructorstandings cs
+JOIN 
+    formula1.constructors c ON cs.constructorId = c.constructorId
+JOIN 
+    formula1.races r ON cs.raceId = r.raceId
+	order by cs.points desc;
 
 
