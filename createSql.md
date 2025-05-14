@@ -1,5 +1,6 @@
 # Entity-Relationship Diagram (ERD)
 
+![ER Diagram from dbdiagram.io](./ER_Diagram.png)
 
 # Formula 1 PostgreSQL Database Schema
 
