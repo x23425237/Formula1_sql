@@ -32,7 +32,7 @@ PostgreSQL
 
 ## SQL Analysis (wip)
 
-![SQL Analysis](./sqlScripts/sql queries.sql)
+![SQL Analysis](./sqlScripts/sql_queries.sql)
 
 
 ### Tables
