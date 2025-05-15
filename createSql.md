@@ -30,6 +30,11 @@ All tables are defined under the `formula1` schema and represent various aspects
 PostgreSQL  
 [dbdiagram.io](https://dbdiagram.io)
 
+## SQL Analysis (wip)
+
+![SQL Analysis](./sqlScripts/sql queries.sql)
+
+
 ### Tables
 
 
