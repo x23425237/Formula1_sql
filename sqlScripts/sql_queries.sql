@@ -236,3 +236,127 @@ JOIN
 	order by cs.points desc;
 
 
+-- The winners only table:
+select "raceId" from formula1.races ;
+where raceid=18
+
+select * from formula1.results
+where raceid=18
+
+with driver_wins as (
+SELECT 
+    r.year,
+	r.date,
+	d.number,
+    r.name AS race_name,
+	d.forename || ' ' || d.surname AS driver_name,
+    d.nationality,
+    res.position AS race_position,
+	count(res.position) over (partition by d.driverid order by year) as total_number_of_wins, 
+    count(res.position) over (partition by d.driverid,r.year order by year) as number_of_wins_perseason,-- -- total number of wins per season
+    ds.points AS championship_points,
+    ds.position AS championship_position
+FROM formula1.results res
+left JOIN formula1.races r ON res.raceId = r."raceId"
+left join formula1.drivers d ON res.driverId = d.driverId
+left join formula1.driverstandings ds 
+    ON ds.raceId = r."raceId" AND ds.driverId = d.driverId
+	--where year=2024
+	where res.position=1
+	--and d.number=33 
+	)
+select dw.year,
+dw.date,
+dw.race_name,
+dw.race_position,
+dw.driver_name,
+dw.total_number_of_wins,
+dw.number_of_wins_perseason
+from driver_wins dw
+ORDER BY total_number_of_wins desc,year desc;
+
+
+# --------
+
+-- status count by season  
+
+SELECT 
+    distinct(d.driverRef),
+    d.number,
+    d.forename || ' ' || d.surname AS driver_name,
+    r.year,
+    s.status,
+    --COUNT(s.status) AS statuscount,
+	count(s.status) OVER (PARTITION BY s.status, r.year) AS total_points
+FROM formula1.results res
+INNER JOIN formula1.status s ON res.statusId = s."statusId"
+INNER JOIN formula1.races r ON res.raceId = r."raceId"
+INNER JOIN formula1.drivers d ON res.driverId = d.driverId
+where d.number!=0
+and driverref='piastri'
+
+ORDER BY 
+r.year desc,
+    total_points DESC;
+
+
+select distinct(status) from formula1.status
+
+
+SELECT *
+FROM crosstab(
+    $$SELECT 
+        d.driverRef || '_' || r.year AS driver_year,
+        s.status,
+        COUNT(*) AS status_count
+    FROM formula1.results res
+    INNER JOIN formula1.status s ON res.statusId = s."statusId"
+    INNER JOIN formula1.races r ON res.raceId = r."raceId"
+    INNER JOIN formula1.drivers d ON res.driverId = d.driverId
+    WHERE d.number != 0
+	 AND d.driverRef like '%piastri%'
+    GROUP BY d.driverRef, r.year, s.status
+    ORDER BY r.year DESC, s.status$$,
+
+    $$SELECT unnest(ARRAY[
+	    '+1 Lap',
+        'Electrical',
+        'Fuel pipe',
+        'Brake duct',
+        'Gearbox',
+        'Finished',
+        'Disqualified',
+        'Turbo',
+        'Crankshaft',
+        'Power Unit',
+        'Suspension',
+        'Collision',
+        'Wheel nut',
+        'ERS',
+        'Water leak',
+        'Mechanical',
+		'Collision damage',
+		'Radiator'
+		
+    ])::text$$
+) AS ct (
+    driver_year text,
+	"+1 Lap" int,
+    "Electrical" int,
+    "Fuel pipe" int,
+    "Brake duct" int,
+    "Gearbox" int,
+    "Finished" int,
+    "Disqualified" int,
+    "Turbo" int,
+    "Crankshaft" int,
+    "Power Unit" int,
+    "Suspension" int,
+    "Collision" int,
+    "Wheel nut" int,
+    "ERS" int,
+    "Water leak" int,
+    "Mechanical" int,
+	"Collision damage" int,
+	"Radiator" int
+);
